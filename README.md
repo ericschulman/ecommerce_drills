@@ -1,6 +1,8 @@
 # drills
 code to analyze data on drill prices scraped
 
+## Entry columns/definitions
+
 
 ## Variable definitions for data 
 
