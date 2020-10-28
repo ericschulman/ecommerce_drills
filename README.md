@@ -2,24 +2,24 @@
 code to analyze data on drill prices scraped
 
 ## Entry columns/definitions
-1. HD
-2. city
-3. state
-4. LO
-5. city
-6. state
-7. address
-8. city
-9. store
-10. time
-11. url
-12. zipcode
-13. STATE
-14. STATENS
-15. STATE_NAME
-16. STUSAB
-17. NAME
-18. population
+1. HD: # of Home Depot stores
+2. city: city name for Home Depot store
+3. state: state for Home Depot store
+4. LO: # of Lowe's stores
+5. city: city name for Lowe's store
+6. state: state for Lowe's store
+7. address: address for Home Depot store
+8. city: city name for Home Depot store
+9. store: store name (Home Depot vs Lowe's)
+10. time: time stamp
+11. url: website url
+12. zipcode: store zip code
+13. STATE: state number
+14. STATENS: state code
+15. STATE_NAME: state name
+16. STUSAB: state abbreviation
+17. NAME: city name and state
+18. population: population count
 19. under44_1
 20. under44_2
 21. under44_3
@@ -31,8 +31,8 @@ code to analyze data on drill prices scraped
 27. farmers
 28. realestate
 29. construction_workers
-30. state:1
-31. place
+30. state:1: state number
+31. place: place ID
 
 ## Variable definitions for data 
 
