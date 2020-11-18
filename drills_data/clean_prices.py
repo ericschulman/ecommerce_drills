@@ -48,10 +48,16 @@ def calc_purch(prices):
 
 if __name__ == "__main__":
     prices = pd.read_csv("prices.csv")
-    prices['calc_rank'] = calc_rank(prices)
-    prices['calc_inven'] = calc_inven(prices)
-    prices['calc_promo'] = calc_promo(prices)
-    prices['calc_ship'] = calc_ship(prices)
-    prices['calc_purch'] = calc_purch(prices)
+    cleaned_columns = ['calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
+    for column in cleaned_columns:
+        prices[column] = globals()[column](prices)  
+        quantile_25 = np.quantile(prices[column], 0.25)
+        quantile_75 = np.quantile(prices[column], 0.75)
+        low_idx = quantile_25 - 1.5 * (quantile_75 - quantile_25)
+        high_idx = quantile_75 + 1.5 * (quantile_75 - quantile_25)
+        ranges = [low_idx, high_idx]
+        prices = prices[~prices[column].isin(ranges)]
+
     prices.to_csv(r'clean_prices.csv', index = False, header=True)
+
     
