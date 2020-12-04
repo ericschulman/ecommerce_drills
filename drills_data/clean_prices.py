@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import copy
 
 def calc_rank(prices):
     return prices['rank'] + (prices['rank'] == 0)*21
@@ -54,8 +55,8 @@ def add_clean_columns(prices):
 def remove_outliers(prices):
     outliers = ['weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
     for column in outliers:
-        quantile_25 = np.quantile(prices[column], 0.25)
-        quantile_75 = np.quantile(prices[column], 0.75)
+        quantile_25 = np.nanquantile(prices[column], 0.25)
+        quantile_75 = np.nanquantile(prices[column], 0.75)
         low_idx = quantile_25 - 1.5 * (quantile_75 - quantile_25)
         high_idx = quantile_75 + 1.5 * (quantile_75 - quantile_25)
         ranges = [low_idx, high_idx]
