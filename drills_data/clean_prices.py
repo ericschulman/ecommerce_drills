@@ -54,17 +54,19 @@ def add_clean_columns(prices):
 
 def remove_outliers(prices):
     outliers = ['weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
+    clean_prices = prices.copy()
     for column in outliers:
         quantile_25 = np.nanquantile(prices[column], 0.25)
         quantile_75 = np.nanquantile(prices[column], 0.75)
         low_idx = quantile_25 - 1.5 * (quantile_75 - quantile_25)
         high_idx = quantile_75 + 1.5 * (quantile_75 - quantile_25)
         ranges = [low_idx, high_idx]
-        clean_prices = prices[~prices[column].isin(ranges)]
+        clean_prices = clean_prices[~clean_prices[column].isna()]
+        clean_prices = clean_prices[~clean_prices[column].isin(ranges)]
     return clean_prices
 
 if __name__ == "__main__":
     prices = pd.read_csv("prices.csv")
-    add_clean_columns(prices)           # add cleaned columns to the dataframe
-    remove_outliers(prices)             # trim data 
-    prices.to_csv(r'clean_prices.csv', index = False, header=True)
+    add_clean_columns(prices)                          # add cleaned columns to the dataframe
+    clean_prices = remove_outliers(prices)             # trim data 
+    clean_prices.to_csv(r'clean_prices.csv', index = False, header=True)
