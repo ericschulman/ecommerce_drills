@@ -65,8 +65,37 @@ def remove_outliers(prices):
         clean_prices = clean_prices[~clean_prices[column].isin(ranges)]
     return clean_prices
 
+def create_panel(clean_prices):
+    clean_prices['datetime'] = (clean_prices['date']/1000).apply(datetime.fromtimestamp)
+    clean_prices['byweek'] = clean_prices.datetime.dt.strftime('%W')
+    clean_prices['nlabel'] = clean_prices["platform"] + clean_prices["product"] + clean_prices["manufacturer"]
+
+    #create a multi-index (creates a column)
+    week = clean_prices["byweek"].unique()
+    label = clean_prices['nlabel'].unique()
+
+    # year - weekly data, foundrylist = platform-product-manufacturer concatenated columns, unique <- index
+    panel_index = pd.MultiIndex.from_product([week, label], names=['byweek','nlabel'])
+
+    #most numerical attributes
+    panel = pd.DataFrame(index=panel_index)
+
+    attribute_names = ['platform', 'product', 'manufacturer',
+    					'weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
+    
+    attr_array = clean_prices[['byweek','nlabel']+ attribute_names].copy()
+   
+	#create count and attr / creating a group_by by week, label
+    attr_array = attr_array.groupby(['byweek','nlabel']).mean()
+    print(panel.shape) 
+    panel = panel.join(attr_array,how='left')
+    print(panel.shape)
+    
+    return panel
+
 if __name__ == "__main__":
     prices = pd.read_csv("prices.csv")
     add_clean_columns(prices)                          # add cleaned columns to the dataframe
     clean_prices = remove_outliers(prices)             # trim data 
+    clean_prices = create_panel(clean_prices)          # create a balanced panel
     clean_prices.to_csv(r'clean_prices.csv', index = False, header=True)
