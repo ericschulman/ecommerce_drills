@@ -54,7 +54,8 @@ def add_clean_columns(prices):
         prices[column] = globals()[column](prices) 
 
 def remove_outliers(prices):
-    outliers = ['weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
+    #outliers = ['weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
+    outliers = ['price']
     clean_prices = prices.copy()
     for column in outliers:
         quantile_25 = np.nanquantile(prices[column], 0.25)
@@ -81,15 +82,18 @@ def create_panel(clean_prices):
     #most numerical attributes
     panel = pd.DataFrame(index=panel_index)
 
-    attribute_names = ['platform', 'product', 'manufacturer',
-    					'weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
+    text_attributes = ['platform', 'product', 'manufacturer','model']
+    numeric_attributes = ['price', 'ads','in_stock','weight', 'reviews', 'rating', 'calc_rank', 'calc_inven', 'calc_promo', 'calc_ship']
     
-    attr_array = clean_prices[['byweek','nlabel']+ attribute_names].copy()
+    attr_array = clean_prices[['byweek','nlabel']+ text_attributes + numeric_attributes].copy()
    
 	#create count and attr / creating a group_by by week, label
-    attr_array = attr_array.groupby(['byweek','nlabel']).mean()
+    attr_array1 = attr_array.groupby(['byweek','nlabel'])[text_attributes].first()
+    attr_array2 = attr_array.groupby(['byweek','nlabel'])[numeric_attributes].mean()
     print(panel.shape) 
-    panel = panel.join(attr_array,how='left')
+    panel = panel.join(attr_array1,how='left')
+    print(panel.shape)
+    panel = panel.join(attr_array2,how='left')
     print(panel.shape)
     
     return panel
@@ -97,6 +101,7 @@ def create_panel(clean_prices):
 if __name__ == "__main__":
     prices = pd.read_csv("prices.csv")
     add_clean_columns(prices)                          # add cleaned columns to the dataframe
+    prices.to_csv('clean_prices.csv', index = False, header=True)
     clean_prices = remove_outliers(prices)             # trim data 
     clean_prices = create_panel(clean_prices)          # create a balanced panel
-    clean_prices.to_csv(r'clean_prices.csv', index = False, header=True)
+    clean_prices.to_csv('panel_prices.csv', header=True)
