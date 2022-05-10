@@ -1,95 +1,58 @@
-# drills
-code to analyze data on drill prices scraped
+# Background
+
+This repository analyzes scraped data about Amazon, Home Depot, Lowe's, and Walmart's price competition in digital markets. The data involves power drills. 
+
+For more background information on this market see the following articles:
+* [article 1](https://www.emarketer.com/content/digital-investments-pay-off-for-walmart-in-ecommerce-race)
+* [article 2](https://techcrunch.com/2018/07/13/amazons-share-of-the-us-e-commerce-market-is-now-49-or-5-of-all-retail-spend/)
+* [article 3](https://www.emarketer.com/Chart/Top-10-US-Companies-Ranked-by-Retail-Ecommerce-Sales-Share-2018-of-US-retail-ecommerce-sales/220521)
+* [article 4](https://www.statista.com/statistics/276846/reach-of-top-online-retail-categories-worldwide/)
 
 
-## Scraper code
+# Data
 
-### installing selenium with anacondas
-conda install selenium
-conda install -c conda-forge geckodriver
+The main datasets file is `prices.csv` located in the `data` folder. There is also `entry.csv` which has brick and mortar locations for Lowe's and Home Depot. For more information on the entry dataset see [this kaggle page](https://www.kaggle.com/datasets/erichschulman/home-improvement-stores). The `.sql` files in this folder can be used when `prices.csv` is loaded into a `sql` database.
 
-
-### walmart
-* walmart get pick up options
-* add store address to db
-* add store invetory
-
-### home depot
-* change location using storeid?
-* home depot get pickup options
-* home depot - weight and other quantity information
-
-### amazon
-
-### news:
-https://www.emarketer.com/content/digital-investments-pay-off-for-walmart-in-ecommerce-race
-https://techcrunch.com/2018/07/13/amazons-share-of-the-us-e-commerce-market-is-now-49-or-5-of-all-retail-spend/
-https://www.emarketer.com/Chart/Top-10-US-Companies-Ranked-by-Retail-Ecommerce-Sales-Share-2018-of-US-retail-ecommerce-sales/220521
-https://www.statista.com/statistics/276846/reach-of-top-online-retail-categories-worldwide/
-
-
-
-
-## Entry columns/definitions
-1. HD: # of Home Depot stores
-2. city: city name for Home Depot store
-3. state: state for Home Depot store
-4. LO: # of Lowe's stores
-5. city: city name for Lowe's store
-6. state: state for Lowe's store
-7. address: address for Home Depot store
-8. city: city name for Home Depot store
-9. store: store name (Home Depot vs Lowe's)
-10. time: time stamp
-11. url: website url
-12. zipcode: store zip code
-13. STATE: state number
-14. STATENS: state code
-15. STATE_NAME: state name
-16. STUSAB: state abbreviation
-17. NAME: city name and state
-18. population: population count
-19. under44_1
-20. under44_2
-21. under44_3
-22. older65_1
-23. older65_2
-24. income_per_capita
-25. industrial_managers
-26. construction_managers
-27. farmers
-28. realestate
-29. construction_workers
-30. state:1: state number
-31. place: place ID
 
 ## Variable definitions for data 
 
-* date variable is in epoch time
+Because my data comes directly from the retailers It is possible to differentiate when the manufacturer or the retailer orders the price cut. I collected the following information using the scraper: 
+
+* prices
+* shipping prices
+* shipping times 
+* delivery methods
+* its rank in the search results (sorted by best seller)
+* inventory - There are up to 3 flexible columns that are used to record information available about quantity on the website. These variables have different meanings across the various retailers.
+	1. Amazon
+	* quantity 1 - number of sellers
+	* quantity 2 - rank in amazon department
+	* quantity 3 - limited stock (number left)
+	2. Walmart
+	* quantity 1- quantity in store
+	* quantity 2 - should have a special offer
+	* quantity 3 - urgent quantity
+	3. Home Depot
+	* quantity 1 - in store stock 
+	* quantity 2 - limited quantity (number left)
+	4. Lowe's
+	* quantity 1 - stock in store
+	* quantity 2 - price below retail (so, number is not shared)
+* store locations
+* whether or not the product is in stock
+* whether or not there was a sale (trade promotion)
+* ads 1 means that it was sponsered, 0 means it wasn't promoted
+* The date variable is in epoch time. This is the date that the page was visited and the data was scraped.
 
 
 
-## Amazon quantity variables
-* quantity 1 - number of sellers
-* quantity 2 - rank in amazon department
-* quantity 3 - limited stock (number left)
+# Processing files
+
+The main file for preprocessing is `clean_prices.py`. This creates more consistent `inventory` information for each of the sellers.
+* `calc_rank` makes rank more interpretable.
+* `calc_inven` tries to make inventory comparable accross sellers.
+* `calc_ship` tries to convert shipping information into a price and date.
+* `create_panel` tries to create a balanced panel with the observations.
 
 
-## Walmart quantity variables
-
-* quantity 1- quantity in store
-* quantity 2 - should have a special offer
-* quantity 3 - urgent quantity
-
-
-## HD quantity variables
-
-* quantity 1 - in store stock 
-* quantity 2 - limited quantity (number left)
-
-
-## Lowe's quantity variables
-
-* quantity 1 - stock in store
-* quantity 2 - price below retail (so, number is not shared)
-
+The `ipython` notebooks in this repository correspond to the dataset that they use. For example, the notebooks that start with `price` use the `prices.csv` dataset. The ones that start with `entry` use the `entry.csv` dataset.
